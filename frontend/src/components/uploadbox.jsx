@@ -8,6 +8,9 @@ function UploadBox() {
     const [message, setMessage] =
         useState("");
 
+    const [result, setResult] =
+        useState("");
+
     const uploadFile = async () => {
 
         if (!file) {
@@ -20,8 +23,10 @@ function UploadBox() {
         }
 
         setMessage(
-            "Cleaning dataset..."
+            "Analyzing dataset..."
         );
+
+        setResult("");
 
         const formData =
             new FormData();
@@ -35,7 +40,7 @@ function UploadBox() {
 
             const response =
                 await fetch(
-                    "http://127.0.0.1:8000/clean",
+                    "http://127.0.0.1:8000/predict",
                     {
                         method: "POST",
                         body: formData
@@ -45,42 +50,21 @@ function UploadBox() {
             if (!response.ok) {
 
                 throw new Error(
-                    "Upload failed"
+                    "Prediction failed"
                 );
             }
 
-            const blob =
-                await response.blob();
+            // Convert backend response
+            const data =
+                await response.json();
 
-            const url =
-                window.URL.createObjectURL(
-                    blob
-                );
-
-            const link =
-                document.createElement(
-                    "a"
-                );
-
-            link.href = url;
-
-            link.download =
-                "cleaned_data.csv";
-
-            document.body.appendChild(
-                link
-            );
-
-            link.click();
-
-            link.remove();
-
-            window.URL.revokeObjectURL(
-                url
+            // Store Ollama response
+            setResult(
+                data.prediction
             );
 
             setMessage(
-                "Download completed!"
+                "Prediction completed!"
             );
 
         }
@@ -99,10 +83,12 @@ function UploadBox() {
 
         <div className="container">
 
-            <h1>InferIQ</h1>
+            <h1>
+                InferIQ
+            </h1>
 
             <p>
-                Upload your noisy CSV dataset
+                Upload your dataset
             </p>
 
             <input
@@ -115,11 +101,36 @@ function UploadBox() {
                 }
             />
 
-            <button onClick={uploadFile}>
-                Clean Dataset
+            <br />
+
+            <button
+                onClick={uploadFile}
+            >
+                Predict Best Algorithm
             </button>
 
-            <p>{message}</p>
+            <p>
+                {message}
+            </p>
+
+            {
+                result && (
+
+                    <div
+                        className="result-box"
+                    >
+
+                        <h2>
+                            AI Recommendation
+                        </h2>
+
+                        <p>
+                            {result}
+                        </p>
+
+                    </div>
+                )
+            }
 
         </div>
     );

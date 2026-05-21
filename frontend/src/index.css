@@ -68,3 +68,16 @@ p {
 
     margin-top: 15px;
 }
+
+.result-box {
+
+    margin-top: 20px;
+
+    padding: 20px;
+
+    background: #334155;
+
+    border-radius: 10px;
+
+    text-align: left;
+}
